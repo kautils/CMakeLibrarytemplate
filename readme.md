@@ -37,18 +37,18 @@ set(${module_name}_common_pref
 )
 
 CMakeLibraryTemplate(${module_name} EXPORT_LIB_TYPE static ${${module_name}_common_pref} )
+
 # generate target for shared library. there is no confliction between static and shared. 
 #CMakeLibraryTemplate(${module_name} EXPORT_LIB_TYPE shared ${${module_name}_common_pref} )
-```
-### note 
 
-* rule
-    * name for find_pacakge :  ${PROJECT_NAME}.${EXPORT_LIB_TYPE} 
-    * target                :  a_b_c_${module_name}_${PROJECT_VERSION}_${EXPORT_LIB_TYPE}
-    * alias                 :  a\:\:b\:\:c\:\:${module_name}\:\:${PROJECT_VERSION}\:\:${EXPORT_LIB_TYPE}
-    * preprocessor for test :  ${${module_name}_${EXPORT_LIB_TYPE}_tmain_ppcs}
-* concrete
-    * name for find_pacakge : SomeLibrary.0.0.1.static   
-    * target                :  a_b_c_some_library_0.0.1_static
-    * alias                 :  a\:\:b\:\:c\:\:some_library\:\:0.0.1\:\:static
-    * preprocessor for test :  TMAIN_A_B_C_SOME_LIBRARY_STATIC
+# rule
+    # name for find_pacakge :  ${PROJECT_NAME}.${EXPORT_LIB_TYPE} 
+    # target                :  a_b_c_${module_name}_${PROJECT_VERSION}_${EXPORT_LIB_TYPE}
+    # alias                 :  a::b::c::${module_name}::${PROJECT_VERSION}::${EXPORT_LIB_TYPE}
+    # preprocessor for test :  ${${module_name}_${EXPORT_LIB_TYPE}_tmain_ppcs}
+# concrete
+    # name for find_pacakge : SomeLibrary.0.0.1.static   
+    # target                :  a_b_c_some_library_0.0.1_static
+    # alias                 :  a::b::c::some_library::0.0.1::static
+    # preprocessor for test :  TMAIN_A_B_C_SOME_LIBRARY_STATIC
+```
