@@ -85,7 +85,7 @@ macro(CMakeLibraryTemplate parse_prfx)
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}Config.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}ConfigVersion.cmake
-            DESTINATION ${__destination_lib_dir}/${include_dest}/${__exp_name}
+            DESTINATION ${__destination_lib_dir}/${include_dest}/${${parse_prfx}_EXPORT_NAME_PREFIX}
         )
     endforeach()
     
