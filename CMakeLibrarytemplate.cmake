@@ -80,19 +80,19 @@ macro(CMakeLibraryTemplate parse_prfx)
         install(FILES ${headers} DESTINATION ${include_dest}/${__module}) 
     endforeach()
     
-    foreach(include_dest ${__destination_cmake_dirs})
+    foreach(cmake_dest ${__destination_cmake_dirs})
         install(FILES
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}Config.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}ConfigVersion.cmake
-            DESTINATION ${__destination_lib_dir}/${include_dest}/${${parse_prfx}_EXPORT_NAME_PREFIX}
+            DESTINATION ${__destination_lib_dir}/${cmake_dest}/${${parse_prfx}_EXPORT_NAME_PREFIX}
         )
     endforeach()
     
     # cmake for find package
     install(TARGETS ${__t} EXPORT ${__t} DESTINATION ${__destination_lib_dir}) 
     set_target_properties(${__t} PROPERTIES EXPORT_NAME ${__alias} ) 
-    install(EXPORT ${__t} FILE ${__exp_name}.cmake DESTINATION ${__destination_lib_dir}/cmake/${__exp_name})
+    install(EXPORT ${__t} FILE ${__exp_name}.cmake DESTINATION ${__destination_lib_dir}/cmake/${${parse_prfx}_EXPORT_NAME_PREFIX})
     export(EXPORT ${__t} FILE "${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}.cmake")
     
     
