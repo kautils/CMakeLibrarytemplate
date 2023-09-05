@@ -64,7 +64,7 @@ macro(CMakeLibraryTemplate parse_prfx)
     set(__t ${__main})
     set(${parse_prfx}_${__lib_type} ${__t})
     set(${parse_prfx}_${__lib_type}_tmain_ppcs TMAIN_${__PRFX_MAIN}${__MODULE}_${__LIB_TYPE})
-    set(${parse_prfx}_${__lib_type}_tmain tmain_${__prfx_main}${__module}_${__lib_type})
+    set(${parse_prfx}_${__lib_type}_tmain tmain_${__prfx_main}${__module}_${__exp_ver}_${__lib_type})
     
     add_library(${__t} ${__LIB_TYPE})
     add_library(${__alias} ALIAS ${__t})
