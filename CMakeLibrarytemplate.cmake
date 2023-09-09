@@ -69,8 +69,15 @@ macro(CMakeLibraryTemplate parse_prfx)
     add_library(${__t} ${__LIB_TYPE})
     add_library(${__alias} ALIAS ${__t})
     target_sources(${__t} PRIVATE ${__srcs})
-    target_link_libraries(${__t} PRIVATE ${__libs})
-    target_include_directories(${__t} PUBLIC ${__includes})
+    
+    if(NOT ${__lib_type} STREQUAL "interface")
+        target_link_libraries(${__t} PRIVATE ${__libs})
+        target_include_directories(${__t} PUBLIC ${__includes})
+    else()
+        target_link_libraries(${__t} INTERFACE ${__libs})
+        target_include_directories(${__t} INTERFACE ${__includes})
+    endif()
+    
     set_target_properties(${__t} PROPERTIES OUTPUT_NAME  ${__prfx_main}${__module})
     
     ##### INSTALL & EXPORT #####
