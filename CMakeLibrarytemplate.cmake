@@ -70,13 +70,42 @@ macro(CMakeLibraryTemplate parse_prfx)
     add_library(${__alias} ALIAS ${__t})
     target_sources(${__t} PRIVATE ${__srcs})
     
+    
+    
+    macro(split_interface __build __install __list)
+        foreach(__var ${__list})
+            string(FIND ${__var} $<BUILD_ __pos)
+            if(${__pos} EQUAL 0)
+                list(APPEND ${__build} ${__var})
+                continue()
+            endif()
+            
+            string(FIND ${__var} $<INSTALL_ __pos)
+            if(${__pos} EQUAL 0)
+                list(APPEND ${__install} ${__var})
+                continue()
+            endif()
+            list(APPEND ${__build} ${__var})
+            list(APPEND ${__install} ${__var})
+        endforeach()
+        unset(__build)
+        unset(__install)
+        unset(__list)
+        unset(__pos)
+    endmacro()
+    
+    list(APPEND __unset_vars __inc_bld_intfc __inc_ins_intfc __lib_bld_intfc __lib_ins_intfc)
+    split_interface(__inc_bld_intfc __inc_ins_intfc "${__includes}")
+    split_interface(__lib_bld_intfc __lib_ins_intfc "${__libs}")
+    
     if(NOT ${__lib_type} STREQUAL "interface")
-        target_link_libraries(${__t} PRIVATE ${__libs})
-        target_include_directories(${__t} PUBLIC ${__includes})
-    else()
-        target_link_libraries(${__t} INTERFACE ${__libs})
-        target_include_directories(${__t} INTERFACE ${__includes})
+        target_link_libraries(${__t} PRIVATE ${__lib_bld_intfc})
+        target_include_directories(${__t} PRIVATE ${__inc_bld_intfc})
     endif()
+    target_link_libraries(${__t} INTERFACE ${__lib_ins_intfc})
+    target_include_directories(${__t} INTERFACE ${__inc_bld_intfc})
+    
+    
     
     set_target_properties(${__t} PROPERTIES OUTPUT_NAME  ${__prfx_main}${__module})
     
