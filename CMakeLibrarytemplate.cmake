@@ -102,8 +102,10 @@ macro(CMakeLibraryTemplate parse_prfx)
         target_link_libraries(${__t} PRIVATE ${__lib_bld_intfc})
         target_include_directories(${__t} PRIVATE ${__inc_bld_intfc})
     endif()
-    target_link_libraries(${__t} INTERFACE ${__lib_ins_intfc})
+    target_link_libraries(${__t} INTERFACE ${__lib_bld_intfc})
     target_include_directories(${__t} INTERFACE ${__inc_bld_intfc})
+    
+    target_include_directories(${__t} PUBLIC ${__inc_ins_intfc})
     
     
     
