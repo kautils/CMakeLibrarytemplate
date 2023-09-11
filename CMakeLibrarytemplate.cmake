@@ -100,11 +100,14 @@ macro(CMakeLibraryTemplate parse_prfx)
     split_interface(__lib_bld_private __lib_bld_intfc __lib_ins_intfc "${__libs}")
     
     
+    
     if(NOT ${__lib_type} STREQUAL "interface")
         target_link_libraries(${__t} PRIVATE ${__lib_bld_private})
-        target_include_directories(${__t} PRIVATE ${__lib_bld_private})
+        target_include_directories(${__t} PRIVATE ${__inc_bld_private})
+        
         target_link_libraries(${__t} INTERFACE ${__lib_bld_intfc})
         target_include_directories(${__t} INTERFACE ${__inc_bld_intfc})
+        
         target_include_directories(${__t} PUBLIC ${__lib_ins_intfc})
         target_include_directories(${__t} PUBLIC ${__inc_ins_intfc})
     else()
@@ -117,19 +120,22 @@ macro(CMakeLibraryTemplate parse_prfx)
     
     
     set_target_properties(${__t} PROPERTIES OUTPUT_NAME  ${__prfx_main}${__module})
-    
-    
+
+
     # cmake for find package
     install(TARGETS ${__t} EXPORT ${__t} DESTINATION ${__destination_lib_dir}) 
     set_target_properties(${__t} PROPERTIES EXPORT_NAME ${__alias} ) 
     export(EXPORT ${__t} FILE "${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}.cmake")
-    
-    
+
+
     ##### INSTALL & EXPORT #####
     # install files
-    file(GLOB headers ${CMAKE_CURRENT_LIST_DIR}/*.h)
-    foreach(include_dest ${__destination_include_dirs})
-        install(FILES ${headers} DESTINATION ${include_dest}/${__module}) 
+    foreach(__include_dir ${__inc_bld_private})
+        file(GLOB headers ${__include_dir}/*.h)
+        message(${headers})
+        foreach(include_dest ${__destination_include_dirs})
+            install(FILES ${headers} DESTINATION ${include_dest}/${__module}) 
+        endforeach()
     endforeach()
     
     foreach(cmake_dest ${__destination_cmake_dirs})
@@ -141,8 +147,8 @@ macro(CMakeLibraryTemplate parse_prfx)
             DESTINATION ${__destination_lib_dir}/${cmake_dest}/${${parse_prfx}_EXPORT_NAME_PREFIX}
         )
     endforeach()
-    
-    
+
+
     list(APPEND __unset_vars __config_in_content __exp_config_in)
     if(NOT EXISTS ${__exp_config_in})
         if(NOT DEFINED __exp_config_in)
@@ -158,7 +164,7 @@ macro(CMakeLibraryTemplate parse_prfx)
                 )
         file(WRITE "${__exp_config_in}" ${__config_in_content})
     endif()
-    
+
     include(CMakePackageConfigHelpers)
     foreach(include_dest ${__destination_cmake_dirs})
         # Config.cmake
@@ -168,7 +174,7 @@ macro(CMakeLibraryTemplate parse_prfx)
           INSTALL_DESTINATION "${__destination_lib_dir}/${include_dest}/${__exp_name}"
         )
     endforeach()
-        
+
     # ConfigVersion.cmake
     write_basic_package_version_file( 
       "${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}ConfigVersion.cmake"
