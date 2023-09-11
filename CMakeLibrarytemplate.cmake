@@ -1,5 +1,6 @@
 macro(CMakeLibraryTemplate parse_prfx)
     
+    
     macro(unsetter list)
         foreach(__var ${list})
             unset(${__var})
@@ -103,12 +104,17 @@ macro(CMakeLibraryTemplate parse_prfx)
     endif()
     target_link_libraries(${__t} INTERFACE ${__lib_bld_intfc})
     target_include_directories(${__t} INTERFACE ${__inc_bld_intfc})
-    
     target_include_directories(${__t} PUBLIC ${__inc_ins_intfc})
     
     
-    
     set_target_properties(${__t} PROPERTIES OUTPUT_NAME  ${__prfx_main}${__module})
+    
+    
+    # cmake for find package
+    install(TARGETS ${__t} EXPORT ${__t} DESTINATION ${__destination_lib_dir}) 
+    set_target_properties(${__t} PROPERTIES EXPORT_NAME ${__alias} ) 
+    export(EXPORT ${__t} FILE "${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}.cmake")
+    
     
     ##### INSTALL & EXPORT #####
     # install files
@@ -118,19 +124,14 @@ macro(CMakeLibraryTemplate parse_prfx)
     endforeach()
     
     foreach(cmake_dest ${__destination_cmake_dirs})
+        # install exported target. if replace EXPORT with FILES, then ${__exp_name}.cmake which is generated in build-dir is installed. this should be cause error  
+        install(EXPORT ${__t} FILE ${__exp_name}.cmake DESTINATION ${__destination_lib_dir}/cmake/${${parse_prfx}_EXPORT_NAME_PREFIX}) 
         install(FILES
-            ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}Config.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}ConfigVersion.cmake
             DESTINATION ${__destination_lib_dir}/${cmake_dest}/${${parse_prfx}_EXPORT_NAME_PREFIX}
         )
     endforeach()
-    
-    # cmake for find package
-    install(TARGETS ${__t} EXPORT ${__t} DESTINATION ${__destination_lib_dir}) 
-    set_target_properties(${__t} PROPERTIES EXPORT_NAME ${__alias} ) 
-    install(EXPORT ${__t} FILE ${__exp_name}.cmake DESTINATION ${__destination_lib_dir}/cmake/${${parse_prfx}_EXPORT_NAME_PREFIX})
-    export(EXPORT ${__t} FILE "${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}.cmake")
     
     
     list(APPEND __unset_vars __config_in_content __exp_config_in)
@@ -167,5 +168,6 @@ macro(CMakeLibraryTemplate parse_prfx)
     )
     
     unsetter("${__unset_vars}")
+    
     
 endmacro()
