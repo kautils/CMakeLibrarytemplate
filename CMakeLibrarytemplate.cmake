@@ -99,16 +99,21 @@ macro(CMakeLibraryTemplate parse_prfx)
     split_interface(__inc_bld_private __inc_bld_intfc __inc_ins_intfc "${__includes}")
     split_interface(__lib_bld_private __lib_bld_intfc __lib_ins_intfc "${__libs}")
     
+    
     if(NOT ${__lib_type} STREQUAL "interface")
         target_link_libraries(${__t} PRIVATE ${__lib_bld_private})
         target_include_directories(${__t} PRIVATE ${__lib_bld_private})
+        target_link_libraries(${__t} INTERFACE ${__lib_bld_intfc})
+        target_include_directories(${__t} INTERFACE ${__inc_bld_intfc})
+        target_include_directories(${__t} PUBLIC ${__lib_ins_intfc})
+        target_include_directories(${__t} PUBLIC ${__inc_ins_intfc})
+    else()
+        target_link_libraries(${__t} INTERFACE ${__lib_bld_intfc})
+        target_include_directories(${__t} INTERFACE ${__inc_bld_intfc})
+        
+        target_include_directories(${__t} INTERFACE ${__lib_ins_intfc})
+        target_include_directories(${__t} INTERFACE ${__inc_ins_intfc})
     endif()
-    
-    target_link_libraries(${__t} INTERFACE ${__lib_bld_intfc})
-    target_include_directories(${__t} INTERFACE ${__inc_bld_intfc})
-    
-    target_include_directories(${__t} PUBLIC ${__lib_ins_intfc})
-    target_include_directories(${__t} PUBLIC ${__inc_ins_intfc})
     
     
     set_target_properties(${__t} PROPERTIES OUTPUT_NAME  ${__prfx_main}${__module})
