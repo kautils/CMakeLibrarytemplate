@@ -132,7 +132,6 @@ macro(CMakeLibraryTemplate parse_prfx)
     # install files
     foreach(__include_dir ${__inc_bld_private})
         file(GLOB headers ${__include_dir}/*.h)
-        message(${headers})
         foreach(include_dest ${__destination_include_dirs})
             install(FILES ${headers} DESTINATION ${include_dest}/${__module}) 
         endforeach()
