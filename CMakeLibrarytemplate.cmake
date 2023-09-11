@@ -73,7 +73,7 @@ macro(CMakeLibraryTemplate parse_prfx)
     
     
     
-    macro(split_interface __build __install __list)
+    macro(split_interface __private __build __install __list)
         foreach(__var ${__list})
             string(FIND ${__var} $<BUILD_ __pos)
             if(${__pos} EQUAL 0)
@@ -86,7 +86,8 @@ macro(CMakeLibraryTemplate parse_prfx)
                 list(APPEND ${__install} ${__var})
                 continue()
             endif()
-            list(APPEND ${__build} ${__var})
+            
+            list(APPEND ${__private} ${__var})
         endforeach()
         unset(__build)
         unset(__install)
@@ -94,16 +95,19 @@ macro(CMakeLibraryTemplate parse_prfx)
         unset(__pos)
     endmacro()
     
-    list(APPEND __unset_vars __inc_bld_intfc __inc_ins_intfc __lib_bld_intfc __lib_ins_intfc)
-    split_interface(__inc_bld_intfc __inc_ins_intfc "${__includes}")
-    split_interface(__lib_bld_intfc __lib_ins_intfc "${__libs}")
+    list(APPEND __unset_vars __lib_bld_private __inc_bld_private __inc_bld_intfc __inc_ins_intfc __lib_bld_intfc __lib_ins_intfc)
+    split_interface(__inc_bld_private __inc_bld_intfc __inc_ins_intfc "${__includes}")
+    split_interface(__lib_bld_private __lib_bld_intfc __lib_ins_intfc "${__libs}")
     
     if(NOT ${__lib_type} STREQUAL "interface")
-        target_link_libraries(${__t} PRIVATE ${__lib_bld_intfc})
-        target_include_directories(${__t} PRIVATE ${__inc_bld_intfc})
+        target_link_libraries(${__t} PRIVATE ${__lib_bld_private})
+        target_include_directories(${__t} PRIVATE ${__lib_bld_private})
     endif()
+    
     target_link_libraries(${__t} INTERFACE ${__lib_bld_intfc})
     target_include_directories(${__t} INTERFACE ${__inc_bld_intfc})
+    
+    target_include_directories(${__t} PUBLIC ${__lib_ins_intfc})
     target_include_directories(${__t} PUBLIC ${__inc_ins_intfc})
     
     
