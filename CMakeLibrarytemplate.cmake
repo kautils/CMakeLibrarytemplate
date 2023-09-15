@@ -100,20 +100,28 @@ macro(CMakeLibraryTemplate parse_prfx)
     split_interface(__lib_bld_private __lib_bld_intfc __lib_ins_intfc "${__libs}")
     
     
-    
-    if(NOT ${__lib_type} STREQUAL "interface")
+    if(NOT ${__lib_type} STREQUAL "interface") # shared or static library
+        # private
         target_link_libraries(${__t} PRIVATE ${__lib_bld_private})
         target_include_directories(${__t} PRIVATE ${__inc_bld_private})
         
+        # build interface (find_package)
         target_link_libraries(${__t} INTERFACE ${__lib_bld_intfc})
         target_include_directories(${__t} INTERFACE ${__inc_bld_intfc})
         
+        # install interface 
         target_include_directories(${__t} PUBLIC ${__lib_ins_intfc})
         target_include_directories(${__t} PUBLIC ${__inc_ins_intfc})
-    else()
+    else() # interafce library
+        # interface
+        target_link_libraries(${__t} INTERFACE ${__lib_bld_private})
+        target_include_directories(${__t} INTERFACE ${__inc_bld_private})
+        
+        # build interface (find_package)
         target_link_libraries(${__t} INTERFACE ${__lib_bld_intfc})
         target_include_directories(${__t} INTERFACE ${__inc_bld_intfc})
         
+        # install interface 
         target_include_directories(${__t} INTERFACE ${__lib_ins_intfc})
         target_include_directories(${__t} INTERFACE ${__inc_ins_intfc})
     endif()
