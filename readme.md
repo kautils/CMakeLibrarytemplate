@@ -27,6 +27,7 @@ set(${module_name}_common_pref
     
     # export name and version
     EXPORT_NAME_PREFIX ${PROJECT_NAME} 
+    EXPORT_NAME_CMAKE_DIR ${PROJECT_NAME} # output cmake files to cmake/${PROJECT_NAME} 
     EXPORT_VERSION ${PROJECT_VERSION}
     EXPORT_VERSION_COMPATIBILITY AnyNewerVersion
     
