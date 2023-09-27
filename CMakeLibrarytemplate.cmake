@@ -21,7 +21,7 @@ macro(CMakeLibraryTemplate parse_prfx)
     set(__unset_vars)
     cmake_parse_arguments( ${parse_prfx} 
             "DEBUG_VERBOSE" 
-            "MODULE_NAME;EXPORT_NAME_PREFIX;EXPORT_VERSION;EXPORT_VERSION_COMPATIBILITY;EXPORT_NAME_CMAKE_DIR;EXPORT_CONFIG_IN_FILE;EXPORT_CONFIG_IN_ADDITIONAL_CONTENT;EXPORT_LIB_TYPE;DESTINATION_LIB_DIR" 
+            "MODULE_NAME;EXPORT_NAME_PREFIX;EXPORT_VERSION;EXPORT_VERSION_COMPATIBILITY;EXPORT_NAME_CMAKE_DIR;EXPORT_CONFIG_IN_FILE;EXPORT_CONFIG_IN_ADDITIONAL_CONTENT_AFTER;EXPORT_CONFIG_IN_ADDITIONAL_CONTENT_BEFORE;EXPORT_LIB_TYPE;DESTINATION_LIB_DIR" 
             "MODULE_PREFIX;LINK_LIBS;DESTINATION_INCLUDE_DIR;DESTINATION_CMAKE_DIR;SOURCES;INCLUDES" 
             ${ARGV})
     
@@ -29,10 +29,11 @@ macro(CMakeLibraryTemplate parse_prfx)
             ${parse_prfx}_MODULE_NAME 
             ${parse_prfx}_EXPORT_NAME_PREFIX 
             ${parse_prfx}_EXPORT_NAME_CMAKE_DIR 
-            ${parse_prfx}_EXPORT_VERSION ${parse_prfx}_EXPORT_VERSION_COMPATIBILITY ${parse_prfx}_EXPORT_CONFIG_IN_FILE ${parse_prfx}_EXPORT_CONFIG_IN_ADDITIONAL_CONTENT ${parse_prfx}_EXPORT_LIB_TYPE 
+            ${parse_prfx}_EXPORT_VERSION ${parse_prfx}_EXPORT_VERSION_COMPATIBILITY ${parse_prfx}_EXPORT_CONFIG_IN_FILE ${parse_prfx}_EXPORT_CONFIG_IN_ADDITIONAL_CONTENT_AFTER ${parse_prfx}_EXPORT_CONFIG_IN_ADDITIONAL_CONTENT_BEFORE ${parse_prfx}_EXPORT_LIB_TYPE 
             ${parse_prfx}_DESTINATION_LIB_DIR ${parse_prfx}_DESTINATION_CMAKE_DIR ${parse_prfx}_DESTINATION_INCLUDE_DIR
             ${parse_prfx}_MODULE_PREFIX ${parse_prfx}_LINK_LIBS  
             ${parse_prfx}_SOURCES ${parse_prfx}_INCLUDES)
+    
     
     list(APPEND __unset_vars __prfx_main __prfx_alias __PRFX_MAIN)
     foreach(prfx ${${parse_prfx}_MODULE_PREFIX})
@@ -49,12 +50,13 @@ macro(CMakeLibraryTemplate parse_prfx)
         set(__module ${${parse_prfx}_MODULE_NAME})
         string(TOUPPER ${__module} __MODULE)
     
-    list(APPEND __unset_vars __exp_compat __exp_name __exp_ver __exp_config_in __exp_config_in_additional)
+    list(APPEND __unset_vars __exp_compat __exp_name __exp_ver __exp_config_in __exp_config_in_additional_after __exp_config_in_additional_before)
         set(__exp_name  ${${parse_prfx}_EXPORT_NAME_PREFIX}.${__lib_type})
         set(__exp_ver ${${parse_prfx}_EXPORT_VERSION})
         set(__exp_compat ${${parse_prfx}_EXPORT_VERSION_COMPATIBILITY})
         set(__exp_config_in ${${parse_prfx}_EXPORT_CONFIG_IN_FILE})
-        string(APPEND __exp_config_in_additional "${${parse_prfx}_EXPORT_CONFIG_IN_ADDITIONAL_CONTENT}")
+        string(APPEND __exp_config_in_additional_after "${${parse_prfx}_EXPORT_CONFIG_IN_ADDITIONAL_CONTENT_AFTER}")
+        string(APPEND __exp_config_in_additional_before "${${parse_prfx}_EXPORT_CONFIG_IN_ADDITIONAL_CONTENT_BEFORE}")
     
     
     if(DEFINED ${parse_prfx}_EXPORT_NAME_CMAKE_DIR)
@@ -185,13 +187,14 @@ macro(CMakeLibraryTemplate parse_prfx)
     endif()
 
     string(APPEND __config_in_content
-            set(${__exp_name}_VERSION @PROJECT_VERSION@) 
+            "${__exp_config_in_additional_before}"
+            \n set(${__exp_name}_VERSION @PROJECT_VERSION@) 
             \n @PACKAGE_INIT@
             \n "set(${__exp_name}_DIR \"\${CMAKE_CURRENT_LIST_DIR}\")" 
             \n "set(${__exp_name}_SYSCONFIG_DIR \"\${CMAKE_CURRENT_LIST_DIR}\")"
             \n "include(\"\${CMAKE_CURRENT_LIST_DIR}/${__exp_name}.cmake\")"
             \n "check_required_components(${__exp_name})"
-            \n "${__exp_config_in_additional}"
+            \n "${__exp_config_in_additional_after}"
             )
     string(MD5 __config_in_content_digest ${__config_in_content})
     if(NOT EXISTS ${__exp_config_in} OR (NOT "${${__exp_name}.last_content_configure_in}" STREQUAL "${__config_in_content_digest}"))
