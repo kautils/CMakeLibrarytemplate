@@ -150,7 +150,9 @@ macro(CMakeLibraryTemplate parse_prfx)
     endif()
     
     
-    set_target_properties(${__t} PROPERTIES OUTPUT_NAME  ${__prfx_main}${__module})
+    
+    
+    set_target_properties(${__t} PROPERTIES OUTPUT_NAME  ${__prfx_main}${__module}.${__exp_ver})
 
 
     # cmake for find package
