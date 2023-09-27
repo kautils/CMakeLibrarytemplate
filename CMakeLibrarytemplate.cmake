@@ -178,20 +178,23 @@ macro(CMakeLibraryTemplate parse_prfx)
     endforeach()
 
 
-    list(APPEND __unset_vars __config_in_content __exp_config_in)
-    if(NOT EXISTS ${__exp_config_in})
-        if(NOT DEFINED __exp_config_in)
-            set(__exp_config_in "${CMAKE_CURRENT_LIST_DIR}/${__module}.${__lib_type}.config.cmake.in")
-        endif()
-        string(APPEND __config_in_content
-                set(${__exp_name}_VERSION @PROJECT_VERSION@) 
-                \n @PACKAGE_INIT@
-                \n set(${__exp_name}_DIR "\${CMAKE_CURRENT_LIST_DIR}") 
-                \n set(${__exp_name}_SYSCONFIG_DIR "\${CMAKE_CURRENT_LIST_DIR}")
-                \n include(\${CMAKE_CURRENT_LIST_DIR}/${__exp_name}.cmake)
-                \n check_required_components(${__exp_name})
-                )
+    list(APPEND __unset_vars __config_in_content __exp_config_in __config_in_content_digest)
+    if(NOT DEFINED __exp_config_in)
+        set(__exp_config_in "${CMAKE_CURRENT_LIST_DIR}/${__module}.${__lib_type}.config.cmake.in")
+    endif()
+
+    string(APPEND __config_in_content
+            set(${__exp_name}_VERSION @PROJECT_VERSION@) 
+            \n @PACKAGE_INIT@
+            \n set(${__exp_name}_DIR "\${CMAKE_CURRENT_LIST_DIR}") 
+            \n set(${__exp_name}_SYSCONFIG_DIR "\${CMAKE_CURRENT_LIST_DIR}")
+            \n include(\${CMAKE_CURRENT_LIST_DIR}/${__exp_name}.cmake)
+            \n check_required_components(${__exp_name})
+            )
+    string(MD5 __config_in_content_digest ${__config_in_content})
+    if(NOT EXISTS ${__exp_config_in} OR (NOT "${${__exp_name}.last_content_configure_in}" STREQUAL "${__config_in_content_digest}"))
         file(WRITE "${__exp_config_in}" ${__config_in_content})
+        set(${__exp_name}.last_content_configure_in ${__config_in_content_digest} CACHE STRING "" FORCE)
     endif()
     
 
