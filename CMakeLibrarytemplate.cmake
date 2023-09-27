@@ -187,10 +187,10 @@ macro(CMakeLibraryTemplate parse_prfx)
     string(APPEND __config_in_content
             set(${__exp_name}_VERSION @PROJECT_VERSION@) 
             \n @PACKAGE_INIT@
-            \n set(${__exp_name}_DIR "\${CMAKE_CURRENT_LIST_DIR}") 
-            \n set(${__exp_name}_SYSCONFIG_DIR "\${CMAKE_CURRENT_LIST_DIR}")
-            \n include(\${CMAKE_CURRENT_LIST_DIR}/${__exp_name}.cmake)
-            \n check_required_components(${__exp_name})
+            \n "set(${__exp_name}_DIR \"\${CMAKE_CURRENT_LIST_DIR}\")" 
+            \n "set(${__exp_name}_SYSCONFIG_DIR \"\${CMAKE_CURRENT_LIST_DIR}\")"
+            \n "include(\"\${CMAKE_CURRENT_LIST_DIR}/${__exp_name}.cmake\")"
+            \n "check_required_components(${__exp_name})"
             \n "${__exp_config_in_additional}"
             )
     string(MD5 __config_in_content_digest ${__config_in_content})
