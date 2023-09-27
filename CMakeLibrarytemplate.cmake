@@ -169,7 +169,6 @@ macro(CMakeLibraryTemplate parse_prfx)
     
     foreach(cmake_dest ${__destination_cmake_dirs})
         # install exported target. if replace EXPORT with FILES, then ${__exp_name}.cmake which is generated in build-dir is installed. this should be cause error  
-#        install(EXPORT ${__t} FILE ${__exp_name}.cmake DESTINATION ${__destination_lib_dir}/cmake/${${parse_prfx}_EXPORT_NAME_PREFIX}) 
         install(EXPORT ${__t} FILE ${__exp_name}.cmake DESTINATION ${__destination_lib_dir}/cmake/${__exp_name_cmake_dir}) 
         install(FILES
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}Config.cmake
@@ -185,12 +184,12 @@ macro(CMakeLibraryTemplate parse_prfx)
             set(__exp_config_in "${CMAKE_CURRENT_LIST_DIR}/${__module}.${__lib_type}.config.cmake.in")
         endif()
         string(APPEND __config_in_content
-                set(@PROJECT_NAME@_VERSION @PROJECT_VERSION@) 
+                set(${__exp_name}_VERSION @PROJECT_VERSION@) 
                 \n @PACKAGE_INIT@
-                \n set(@PROJECT_NAME@_DIR "\${CMAKE_CURRENT_LIST_DIR}") 
-                \n set(@PROJECT_NAME@_SYSCONFIG_DIR "\${CMAKE_CURRENT_LIST_DIR}")
-                \n include(\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@.${__lib_type}.cmake)
-                \n check_required_components(@PROJECT_NAME@)
+                \n set(${__exp_name}_DIR "\${CMAKE_CURRENT_LIST_DIR}") 
+                \n set(${__exp_name}_SYSCONFIG_DIR "\${CMAKE_CURRENT_LIST_DIR}")
+                \n include(\${CMAKE_CURRENT_LIST_DIR}/${__exp_name}.cmake)
+                \n check_required_components(${__exp_name})
                 )
         file(WRITE "${__exp_config_in}" ${__config_in_content})
     endif()
