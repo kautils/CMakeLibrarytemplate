@@ -13,7 +13,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3915d1b8-c3ec-4722-b78e-9dd0799eb2e4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/CmakeLibrarytemplate.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CmakeLibrarytemplate.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLibrarytemplate.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLibrarytemplate.cmake" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
     </list>
@@ -71,7 +74,7 @@
       <workItem from="1694379599743" duration="3386000" />
       <workItem from="1694398261699" duration="92000" />
       <workItem from="1694451187955" duration="2441000" />
-      <workItem from="1694756936763" duration="7000" />
+      <workItem from="1694756936763" duration="1248000" />
     </task>
     <servers />
   </component>

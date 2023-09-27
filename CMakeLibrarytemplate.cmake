@@ -1,6 +1,5 @@
 macro(CMakeLibraryTemplate parse_prfx)
     
-    
     macro(unsetter list)
         foreach(__var ${list})
             unset(${__var})
@@ -20,7 +19,20 @@ macro(CMakeLibraryTemplate parse_prfx)
     endmacro()
     
     set(__unset_vars)
-    cmake_parse_arguments( ${parse_prfx} "DEBUG_VERBOSE" "MODULE_NAME;EXPORT_NAME_PREFIX;EXPORT_VERSION;EXPORT_VERSION_COMPATIBILITY;EXPORT_CONFIG_IN_FILE;EXPORT_LIB_TYPE;DESTINATION_LIB_DIR" "MODULE_PREFIX;LINK_LIBS;DESTINATION_INCLUDE_DIR;DESTINATION_CMAKE_DIR;SOURCES;INCLUDES" ${ARGV})
+    cmake_parse_arguments( ${parse_prfx} 
+            "DEBUG_VERBOSE" 
+            "MODULE_NAME;EXPORT_NAME_PREFIX;EXPORT_VERSION;EXPORT_VERSION_COMPATIBILITY;EXPORT_NAME_CMAKE_DIR;EXPORT_CONFIG_IN_FILE;EXPORT_LIB_TYPE;DESTINATION_LIB_DIR" 
+            "MODULE_PREFIX;LINK_LIBS;DESTINATION_INCLUDE_DIR;DESTINATION_CMAKE_DIR;SOURCES;INCLUDES" 
+            ${ARGV})
+    
+    list(APPEND __unset_vars ${parse_prfx}_DEBUG_VERBOSE 
+            ${parse_prfx}_MODULE_NAME 
+            ${parse_prfx}_EXPORT_NAME_PREFIX 
+            ${parse_prfx}_EXPORT_NAME_CMAKE_DIR 
+            ${parse_prfx}_EXPORT_VERSION ${parse_prfx}_EXPORT_VERSION_COMPATIBILITY ${parse_prfx}_EXPORT_CONFIG_IN_FILE ${parse_prfx}_EXPORT_LIB_TYPE 
+            ${parse_prfx}_DESTINATION_LIB_DIR ${parse_prfx}_DESTINATION_CMAKE_DIR ${parse_prfx}_DESTINATION_INCLUDE_DIR
+            ${parse_prfx}_MODULE_PREFIX ${parse_prfx}_LINK_LIBS  
+            ${parse_prfx}_SOURCES ${parse_prfx}_INCLUDES)
     
     list(APPEND __unset_vars __prfx_main __prfx_alias __PRFX_MAIN)
     foreach(prfx ${${parse_prfx}_MODULE_PREFIX})
@@ -43,6 +55,14 @@ macro(CMakeLibraryTemplate parse_prfx)
         set(__exp_config_in ${${parse_prfx}_EXPORT_CONFIG_IN_FILE})
         set(__exp_compat ${${parse_prfx}_EXPORT_VERSION_COMPATIBILITY})
     
+    
+    if(DEFINED ${parse_prfx}_EXPORT_NAME_CMAKE_DIR)
+        set(__exp_name_cmake_dir ${${parse_prfx}_EXPORT_NAME_CMAKE_DIR})
+    else()
+        set(__exp_name_cmake_dir ${${parse_prfx}_EXPORT_NAME_PREFIX})
+    endif()
+    
+        
     
     list(APPEND __unset_vars __srcs __includes __libs)
         set(__includes ${${parse_prfx}_INCLUDES})
@@ -133,6 +153,8 @@ macro(CMakeLibraryTemplate parse_prfx)
     # cmake for find package
     install(TARGETS ${__t} EXPORT ${__t} DESTINATION ${__destination_lib_dir}) 
     set_target_properties(${__t} PROPERTIES EXPORT_NAME ${__alias} ) 
+
+    
     export(EXPORT ${__t} FILE "${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}.cmake")
 
 
@@ -147,11 +169,12 @@ macro(CMakeLibraryTemplate parse_prfx)
     
     foreach(cmake_dest ${__destination_cmake_dirs})
         # install exported target. if replace EXPORT with FILES, then ${__exp_name}.cmake which is generated in build-dir is installed. this should be cause error  
-        install(EXPORT ${__t} FILE ${__exp_name}.cmake DESTINATION ${__destination_lib_dir}/cmake/${${parse_prfx}_EXPORT_NAME_PREFIX}) 
+#        install(EXPORT ${__t} FILE ${__exp_name}.cmake DESTINATION ${__destination_lib_dir}/cmake/${${parse_prfx}_EXPORT_NAME_PREFIX}) 
+        install(EXPORT ${__t} FILE ${__exp_name}.cmake DESTINATION ${__destination_lib_dir}/cmake/${__exp_name_cmake_dir}) 
         install(FILES
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}Config.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}ConfigVersion.cmake
-            DESTINATION ${__destination_lib_dir}/${cmake_dest}/${${parse_prfx}_EXPORT_NAME_PREFIX}
+            DESTINATION ${__destination_lib_dir}/${cmake_dest}/${__exp_name_cmake_dir}
         )
     endforeach()
 
@@ -171,6 +194,7 @@ macro(CMakeLibraryTemplate parse_prfx)
                 )
         file(WRITE "${__exp_config_in}" ${__config_in_content})
     endif()
+    
 
     include(CMakePackageConfigHelpers)
     foreach(include_dest ${__destination_cmake_dirs})
@@ -181,6 +205,7 @@ macro(CMakeLibraryTemplate parse_prfx)
           INSTALL_DESTINATION "${__destination_lib_dir}/${include_dest}/${__exp_name}"
         )
     endforeach()
+    
 
     # ConfigVersion.cmake
     write_basic_package_version_file( 
