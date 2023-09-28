@@ -181,11 +181,10 @@ macro(CMakeLibraryTemplate parse_prfx)
             DESTINATION ${__destination_lib_dir}/${cmake_dest}/${__exp_name_cmake_dir}
         )
     endforeach()
-
-
+    
     list(APPEND __unset_vars __config_in_content __exp_config_in __config_in_content_digest)
     if(NOT DEFINED __exp_config_in)
-        set(__exp_config_in "${CMAKE_CURRENT_LIST_DIR}/${__module}.${__lib_type}.config.cmake.in")
+        set(__exp_config_in "${CMAKE_CURRENT_BINARY_DIR}/${__module}.${__lib_type}.config.cmake.in")
     endif()
 
     string(APPEND __config_in_content
