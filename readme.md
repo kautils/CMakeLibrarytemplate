@@ -28,6 +28,7 @@ set(${module_name}_common_pref
     # export name and version
     EXPORT_NAME_PREFIX ${PROJECT_NAME} 
     EXPORT_NAME_CMAKE_DIR ${PROJECT_NAME} # output cmake files to cmake/${PROJECT_NAME}. value [EXPORT_NAME_PREFIX] is used as default.  
+        
     EXPORT_VERSION ${PROJECT_VERSION}
     EXPORT_VERSION_COMPATIBILITY AnyNewerVersion
     
@@ -52,4 +53,8 @@ CMakeLibraryTemplate(${module_name} EXPORT_LIB_TYPE static ${${module_name}_comm
     # target                :  a_b_c_some_library_0.0.1_static
     # alias                 :  a::b::c::some_library::0.0.1::static
     # preprocessor for test :  TMAIN_A_B_C_SOME_LIBRARY_STATIC
+
+# EXPORT_NAME_SUFFIX changes  a::b::c::${module_name}::${PROJECT_VERSION}::${EXPORT_LIB_TYPE} to a::b::c::${module_name}::[EXPORT_NAME_SUFFIX]::${EXPORT_LIB_TYPE}
+# EXPORT_RENAME      changes  a::b::c::${module_name}::${PROJECT_VERSION}::${EXPORT_LIB_TYPE} to [EXPORT_RENAME] 
+
 ```
