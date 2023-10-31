@@ -52,25 +52,34 @@ macro(CMakeLibraryTemplate parse_prfx)
         set(__module ${${parse_prfx}_MODULE_NAME})
         string(TOUPPER ${__module} __MODULE)
     
-    list(APPEND __unset_vars __exp_compat __exp_ver __exp_config_in __exp_config_in_additional_after __exp_config_in_additional_before)
-        set(__exp_ver ${${parse_prfx}_EXPORT_VERSION})
+    list(APPEND __unset_vars __exp_compat ${m}_exp_real_version ${m}_exp_dummy_version __exp_config_in __exp_config_in_additional_after __exp_config_in_additional_before)
+        set(${m}_exp_real_version ${${parse_prfx}_EXPORT_VERSION})
         set(__exp_compat ${${parse_prfx}_EXPORT_VERSION_COMPATIBILITY})
         set(__exp_config_in ${${parse_prfx}_EXPORT_CONFIG_IN_FILE})
         string(APPEND __exp_config_in_additional_after "${${parse_prfx}_EXPORT_CONFIG_IN_ADDITIONAL_CONTENT_AFTER}")
         string(APPEND __exp_config_in_additional_before "${${parse_prfx}_EXPORT_CONFIG_IN_ADDITIONAL_CONTENT_BEFORE}")
     
+    
+    # priority EXPORT_RENAME > EXPORT_NAME_SUFFIX > default 
     list(APPEND __unset_vars __main __alias __exp_name ${m}_output_name) 
-        if("${${parse_prfx}_EXPORT_RENAME}" STREQUAL "")
-            set(__main ${__prfx_main}${__module}_${__exp_ver}_${__lib_type})
-            set(__alias ${__prfx_alias}${__module}::${__exp_ver}::${__lib_type})
-            set(__exp_name  ${${parse_prfx}_EXPORT_NAME_PREFIX}.${__lib_type})
-            set(${m}_output_name ${__prfx_main}${__module}.${__exp_ver})
-        else()
-            set(__main ${${parse_prfx}_EXPORT_RENAME}_target)
-            set(__alias ${${parse_prfx}_EXPORT_RENAME})
-            set(__exp_name  ${${parse_prfx}_EXPORT_RENAME})
-            set(${m}_output_name ${${parse_prfx}_EXPORT_RENAME})
+    if(NOT "${${parse_prfx}_EXPORT_RENAME}" STREQUAL "") # case EXPORT_RENAME is specified
+        set(${m}_exp_dummy_version ${${parse_prfx}_EXPORT_VERSION})
+        set(__main ${${parse_prfx}_EXPORT_RENAME}_target)
+        set(__alias ${${parse_prfx}_EXPORT_RENAME})
+        set(__exp_name  ${${parse_prfx}_EXPORT_RENAME})
+        set(${m}_output_name ${${parse_prfx}_EXPORT_RENAME})
+    else()
+        if(NOT "${${parse_prfx}_EXPORT_NAME_SUFFIX}" STREQUAL "") # case EXPORT_NAME_SUFFIX is specified
+            set(${m}_exp_dummy_version "${${parse_prfx}_EXPORT_NAME_SUFFIX}")
+        else() # case default
+            set(${m}_exp_dummy_version "${${m}_exp_real_version}")
         endif()
+        
+        set(__main ${__prfx_main}${__module}_${${m}_exp_dummy_version}_${__lib_type})
+        set(__alias ${__prfx_alias}${__module}::${${m}_exp_dummy_version}::${__lib_type})
+        set(__exp_name  ${${parse_prfx}_EXPORT_NAME_PREFIX}.${__lib_type})
+        set(${m}_output_name ${__prfx_main}${__module}.${${m}_exp_dummy_version})
+    endif()
     
     if(DEFINED ${parse_prfx}_EXPORT_NAME_CMAKE_DIR)
         set(__exp_name_cmake_dir ${${parse_prfx}_EXPORT_NAME_CMAKE_DIR})
@@ -94,7 +103,7 @@ macro(CMakeLibraryTemplate parse_prfx)
     set(__t ${__main})
     set(${parse_prfx}_${__lib_type} ${__t})
     set(${parse_prfx}_${__lib_type}_tmain_ppcs TMAIN_${__PRFX_MAIN}${__MODULE}_${__LIB_TYPE})
-    set(${parse_prfx}_${__lib_type}_tmain tmain_${__prfx_main}${__module}_${__exp_ver}_${__lib_type})
+    set(${parse_prfx}_${__lib_type}_tmain tmain_${__prfx_main}${__module}_${${m}_exp_dummy_version}_${__lib_type})
     
     add_library(${__t} ${__LIB_TYPE})
     add_library(${__alias} ALIAS ${__t})
@@ -220,7 +229,7 @@ macro(CMakeLibraryTemplate parse_prfx)
     # ConfigVersion.cmake
     write_basic_package_version_file( 
       "${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}ConfigVersion.cmake"
-      VERSION "${__exp_ver}" 
+      VERSION "${${m}_exp_real_version}" 
       COMPATIBILITY ${__exp_compat}
     )
     
