@@ -59,17 +59,18 @@ macro(CMakeLibraryTemplate parse_prfx)
         string(APPEND __exp_config_in_additional_after "${${parse_prfx}_EXPORT_CONFIG_IN_ADDITIONAL_CONTENT_AFTER}")
         string(APPEND __exp_config_in_additional_before "${${parse_prfx}_EXPORT_CONFIG_IN_ADDITIONAL_CONTENT_BEFORE}")
     
-    list(APPEND __unset_vars __main __alias __exp_name) 
+    list(APPEND __unset_vars __main __alias __exp_name ${m}_output_name) 
         if("${${parse_prfx}_EXPORT_RENAME}" STREQUAL "")
             set(__main ${__prfx_main}${__module}_${__exp_ver}_${__lib_type})
             set(__alias ${__prfx_alias}${__module}::${__exp_ver}::${__lib_type})
             set(__exp_name  ${${parse_prfx}_EXPORT_NAME_PREFIX}.${__lib_type})
+            set(${m}_output_name ${__prfx_main}${__module}.${__exp_ver})
         else()
             set(__main ${${parse_prfx}_EXPORT_RENAME}_target)
             set(__alias ${${parse_prfx}_EXPORT_RENAME})
             set(__exp_name  ${${parse_prfx}_EXPORT_RENAME})
+            set(${m}_output_name ${${parse_prfx}_EXPORT_RENAME})
         endif()
-
     
     if(DEFINED ${parse_prfx}_EXPORT_NAME_CMAKE_DIR)
         set(__exp_name_cmake_dir ${${parse_prfx}_EXPORT_NAME_CMAKE_DIR})
@@ -98,7 +99,6 @@ macro(CMakeLibraryTemplate parse_prfx)
     add_library(${__t} ${__LIB_TYPE})
     add_library(${__alias} ALIAS ${__t})
     target_sources(${__t} PRIVATE ${__srcs})
-    
     
     
     macro(split_interface __private __build __install __list)
@@ -154,11 +154,8 @@ macro(CMakeLibraryTemplate parse_prfx)
         target_include_directories(${__t} INTERFACE ${__inc_ins_intfc})
     endif()
     
+    set_target_properties(${__t} PROPERTIES OUTPUT_NAME  ${${m}_output_name})
     
-    
-    
-    set_target_properties(${__t} PROPERTIES OUTPUT_NAME  ${__prfx_main}${__module}.${__exp_ver})
-
 
     # cmake for find package
     install(TARGETS ${__t} EXPORT ${__t} DESTINATION ${__destination_lib_dir}) 
