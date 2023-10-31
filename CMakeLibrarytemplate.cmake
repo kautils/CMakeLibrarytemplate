@@ -61,12 +61,13 @@ macro(CMakeLibraryTemplate parse_prfx)
     
     
     # priority EXPORT_RENAME > EXPORT_NAME_SUFFIX > default 
-    list(APPEND __unset_vars __main __alias __exp_name ${m}_output_name) 
+    list(APPEND __unset_vars __main __alias __exp_name __exp_config_in ${m}_output_name) 
     if(NOT "${${parse_prfx}_EXPORT_RENAME}" STREQUAL "") # case EXPORT_RENAME is specified
         set(${m}_exp_dummy_version ${${parse_prfx}_EXPORT_VERSION})
         set(__main ${${parse_prfx}_EXPORT_RENAME}_target)
         set(__alias ${${parse_prfx}_EXPORT_RENAME})
         set(__exp_name  ${${parse_prfx}_EXPORT_RENAME})
+        set(__exp_config_in "${CMAKE_CURRENT_BINARY_DIR}/${${parse_prfx}_EXPORT_RENAME}.config.cmake.in")
         set(${m}_output_name ${${parse_prfx}_EXPORT_RENAME})
     else()
         if(NOT "${${parse_prfx}_EXPORT_NAME_SUFFIX}" STREQUAL "") # case EXPORT_NAME_SUFFIX is specified
@@ -74,12 +75,13 @@ macro(CMakeLibraryTemplate parse_prfx)
         else() # case default
             set(${m}_exp_dummy_version "${${m}_exp_real_version}")
         endif()
-        
+        set(__exp_config_in "${CMAKE_CURRENT_BINARY_DIR}/${__module}.${__lib_type}.${${m}_exp_dummy_version}.config.cmake.in")
         set(__main ${__prfx_main}${__module}_${${m}_exp_dummy_version}_${__lib_type})
         set(__alias ${__prfx_alias}${__module}::${${m}_exp_dummy_version}::${__lib_type})
         set(__exp_name  ${${parse_prfx}_EXPORT_NAME_PREFIX}.${__lib_type})
         set(${m}_output_name ${__prfx_main}${__module}.${${m}_exp_dummy_version})
     endif()
+    
     
     if(DEFINED ${parse_prfx}_EXPORT_NAME_CMAKE_DIR)
         set(__exp_name_cmake_dir ${${parse_prfx}_EXPORT_NAME_CMAKE_DIR})
@@ -132,6 +134,7 @@ macro(CMakeLibraryTemplate parse_prfx)
         unset(__pos)
     endmacro()
     
+    
     list(APPEND __unset_vars __lib_bld_private __inc_bld_private __inc_bld_intfc __inc_ins_intfc __lib_bld_intfc __lib_ins_intfc)
     split_interface(__inc_bld_private __inc_bld_intfc __inc_ins_intfc "${__includes}")
     split_interface(__lib_bld_private __lib_bld_intfc __lib_ins_intfc "${__libs}")
@@ -169,11 +172,11 @@ macro(CMakeLibraryTemplate parse_prfx)
     # cmake for find package
     install(TARGETS ${__t} EXPORT ${__t} DESTINATION ${__destination_lib_dir}) 
     set_target_properties(${__t} PROPERTIES EXPORT_NAME ${__alias} ) 
-
-    
     export(EXPORT ${__t} FILE "${CMAKE_CURRENT_BINARY_DIR}/${__exp_name}.cmake")
 
 
+    
+    
     ##### INSTALL & EXPORT #####
     # install files
     foreach(__include_dir ${__inc_bld_private})
@@ -193,10 +196,7 @@ macro(CMakeLibraryTemplate parse_prfx)
         )
     endforeach()
     
-    list(APPEND __unset_vars __config_in_content __exp_config_in __config_in_content_digest)
-    if(NOT DEFINED __exp_config_in)
-        set(__exp_config_in "${CMAKE_CURRENT_BINARY_DIR}/${__module}.${__lib_type}.config.cmake.in")
-    endif()
+    list(APPEND __unset_vars __config_in_content __config_in_content_digest)
 
     string(APPEND __config_in_content
             "${__exp_config_in_additional_before}"
